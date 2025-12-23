@@ -1,143 +1,116 @@
 # -*- coding: utf-8 -*-
-# pypy 권장
 import sys
 import os
 import zipfile
 import py7zr
 import time
-from decimal import Decimal as foo, getcontext
-getcontext().prec = 16
+
 INEFFICIENT_FORMATS = {".jpg", ".jpeg", ".jpe", ".png", ".mp4", ".mp3", ".avi", ".mp2", ".mp1", ".m4a"}
-def pp(current, total):
-    try:
-        percent = int((current / total) * foo('100'))
-        sys.stdout.write(f"\r{percent}%")
-        sys.stdout.flush()
-    except Exception as e:
-        print("\n진행률 계산 오류:", e)
+MAX_FILE_SIZE = 400 * 1024 * 1024  # 400MB 제한 (압축 해제 시)
+
+def safe_path(base, target):
+    """경로 탈출 방지"""
+    abs_base = os.path.abspath(base)
+    abs_target = os.path.abspath(os.path.join(base, target))
+    if not abs_target.startswith(abs_base):
+        raise Exception(f"경로 탈출 시도 감지: {target}")
+    return abs_target
+
+def safe_extract_zip(zf, output):
+    for name in zf.namelist():
+        target_path = safe_path(output, name)
+        info = zf.getinfo(name)
+        if info.file_size > MAX_FILE_SIZE:
+            print(f"{name}: 파일 크기 초과로 해제 취소")
+            continue
+        zf.extract(name, output)
+
+def safe_extract_7z(archive, output):
+    for name in archive.getnames():
+        target_path = safe_path(output, name)
+        # py7zr은 파일 크기 정보를 직접 제공하지 않으므로 별도 검사 필요
+        archive.extract(targets=[name], path=output)
 
 def cm_zip(files, output="output.zip"):
-    try:
-        with zipfile.ZipFile(output, 'w', compression=zipfile.ZIP_DEFLATED) as zf:
-            total = len(files)
-            for i, file in enumerate(files, 1):
-                ext = os.path.splitext(file)[1].lower()
-                if ext in INEFFICIENT_FORMATS:
-                    print(f"\n{file}: 압축하면 비효율적이니 압축 취소")
-                    continue
-                if not os.path.exists(file):
-                    print(f"\n{file}: 파일이 없음")
-                    continue
-                try:
-                    zf.write(file, os.path.basename(file))
-                except PermissionError:
-                    print(f"\n{file}: 권한 오류")
-                    continue
-                pp(i, total)
-                time.sleep(0.1)
-        print("\n압축 완:", output)
-    except Exception as e:
-        print("ZIP 압축 중 오류 발생:", e)
+    with zipfile.ZipFile(output, 'w', compression=zipfile.ZIP_DEFLATED) as zf:
+        for file in files:
+            ext = os.path.splitext(file)[1].lower()
+            if ext in INEFFICIENT_FORMATS:
+                print(f"{file}: 비효율적 포맷이라 제외")
+                continue
+            if not os.path.exists(file):
+                print(f"{file}: 없음")
+                continue
+            if os.path.getsize(file) > MAX_FILE_SIZE:
+                print(f"{file}: 크기 초과로 제외")
+                continue
+            zf.write(file, os.path.basename(file))
+    print("ZIP 압축 완료:", output)
 
 def decm_zip(file, output="."):
     try:
         with zipfile.ZipFile(file, 'r') as zf:
-            total = len(zf.namelist())
-            for i, name in enumerate(zf.namelist(), 1):
-                try:
-                    zf.extract(name, output)
-                except PermissionError:
-                    print(f"\n{name}: 권한 오류")
-                    continue
-                pp(i, total)
-                time.sleep(0.1)
-        print("\n압축 해제 완:", output)
-    except FileNotFoundError:
-        print("ZIP 파일이 없음:", file)
-    except zipfile.BadZipFile:
-        print("잘못된 ZIP 파일:", file)
+            safe_extract_zip(zf, output)
+        print("ZIP 해제 완료:", output)
     except Exception as e:
-        print("ZIP 해제 중 오류 발생:", e)
+        print("ZIP 해제 오류:", e)
 
 def cm_7z(files, output="output.7z"):
-    try:
-        with py7zr.SevenZipFile(output, 'w') as archive:
-            total = len(files)
-            for i, file in enumerate(files, 1):
-                ext = os.path.splitext(file)[1].lower()
-                if ext in INEFFICIENT_FORMATS:
-                    print(f"\n{file}: 압축하면 비효율적이니 압축 취소")
-                    continue
-                if not os.path.exists(file):
-                    print(f"\n{file}: 파일 존재 불명")
-                    continue
-                try:
-                    archive.write(file, os.path.basename(file))
-                except PermissionError:
-                    print(f"\n{file}: 권한 오류")
-                    continue
-                pp(i, total)
-                time.sleep(0.1)
-        print("\n압축 완:", output)
-    except Exception as e:
-        print("7Z 압축 중 오류 발생:", e)
+    with py7zr.SevenZipFile(output, 'w') as archive:
+        for file in files:
+            ext = os.path.splitext(file)[1].lower()
+            if ext in INEFFICIENT_FORMATS:
+                print(f"{file}: 비효율적 포맷이라 제외")
+                continue
+            if not os.path.exists(file):
+                print(f"{file}: 없음")
+                continue
+            if os.path.getsize(file) > MAX_FILE_SIZE:
+                print(f"{file}: 크기 초과로 제외")
+                continue
+            archive.write(file, os.path.basename(file))
+    print("7Z 압축 완료:", output)
 
 def decm_7z(file, output="."):
     try:
         with py7zr.SevenZipFile(file, 'r') as archive:
-            allfiles = archive.getnames()
-            total = len(allfiles)
-            for i, name in enumerate(allfiles, 1):
-                try:
-                    archive.extract(targets=[name], path=output)
-                except PermissionError:
-                    print(f"\n{name}: 권한 오류")
-                    continue
-                pp(i, total)
-                time.sleep(0.1)
-        print("\n압축 해제 완:", output)
-    except FileNotFoundError:
-        print("7Z 파일이 없음:", file)
-    except py7zr.ArchiveError:
-        print("잘못된 7Z 파일:", file)
+            safe_extract_7z(archive, output)
+        print("7Z 해제 완료:", output)
     except Exception as e:
-        print("7Z 해제 중 오류 발생:", e)
+        print("7Z 해제 오류:", e)
 
 def m():
     if len(sys.argv) < 3:
-        print("사용법:")
-        print("압축: cps z file1 file2 ...")
-        print("압축: cps 7z file1 file2 ...")
-        print("해제: decps z archive.zip")
-        print("해제: decps 7z archive.7z")
+        print("사용법: cps z file1 file2 ... | cps 7z file1 file2 ... | decps z archive.zip | decps 7z archive.7z")
         sys.exit(1)
 
     cm = sys.argv[1]
     m = sys.argv[2]
 
-    try:
-        if cm == "cps":
-            files = sys.argv[3:]
-            if m == "z":
-                cm_zip(files)
-            elif m == "7z":
-                cm_7z(files)
-            else:
-                print("미지원 모드")
-        elif cm == "decps":   
-            archive = sys.argv[3]
-            if m == "z":
-                decm_zip(archive)
-            elif m == "7z":
-                decm_7z(archive)
-            else:
-                print("미지원 모드")
+    if cm == "cps":
+        files = sys.argv[3:]
+        if not files:
+            print("압축할 파일 없음")
+            return
+        if m == "z":
+            cm_zip(files)
+        elif m == "7z":
+            cm_7z(files)
         else:
-            print("미지원")
-    except IndexError:
-        print("인자 부족")
-    except Exception as e:
-        print("실행 중 오류 발생:", e)
+            print("미지원 모드")
+    elif cm == "decps":
+        if len(sys.argv) < 4:
+            print("해제할 파일 없음")
+            return
+        archive = sys.argv[3]
+        if m == "z":
+            decm_zip(archive)
+        elif m == "7z":
+            decm_7z(archive)
+        else:
+            print("미지원 모드")
+    else:
+        print("미지원")
 
 if __name__ == "__main__":
     m()
