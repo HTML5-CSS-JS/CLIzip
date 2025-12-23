@@ -1,6 +1,6 @@
 [project]
 name = "CLIzip"
-version = "alpha 1.0.2"
+version = "alpha 1.1.0"
 description = "A simple CLI tool for ZIP&7Z compression/decompression with progress display"
 license = { text = "MIT" }
 requires-python = "<=3.1.1"
