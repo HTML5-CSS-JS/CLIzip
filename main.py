@@ -12,7 +12,7 @@ INEFFICIENT_FORMATS = {".jpg", ".jpeg", ".jpe", ".png", ".mp4", ".mp3", ".avi", 
 
 def pp(current, total):
     percent = int((current / total) * foo('100'))
-    sys.stdout.write(f"\r진행률: {percent}%")
+    sys.stdout.write(f"\r{percent}%")
     sys.stdout.flush()
 
 def cm_zip(files, output="output.zip"):
@@ -21,12 +21,12 @@ def cm_zip(files, output="output.zip"):
         for i, file in enumerate(files, 1):
             ext = os.path.splitext(file)[1].lower()
             if ext in INEFFICIENT_FORMATS:
-                print(f"\n{file}: 이 포맷은 압축을 하면 비효율적이니 압축을 취소하였습니다.")
+                print(f"\n{file}: 압축하면 비효율적이니 압축 취소")
                 continue
             zf.write(file, os.path.basename(file))
             pp(i, total)
             time.sleep(0.1)
-    print("\n압축 완료:", output)
+    print("\n압축 완:", output)
 
 def decm_zip(file, output="."):
     with zipfile.ZipFile(file, 'r') as zf:
@@ -35,7 +35,7 @@ def decm_zip(file, output="."):
             zf.extract(name, output)
             pp(i, total)
             time.sleep(0.1)
-    print("\n압축 해제 완료:", output)
+    print("\n압축 해제 완:", output)
 
 def cm_7z(files, output="output.7z"):
     with py7zr.SevenZipFile(output, 'w') as archive:
@@ -43,12 +43,12 @@ def cm_7z(files, output="output.7z"):
         for i, file in enumerate(files, 1):
             ext = os.path.splitext(file)[1].lower()
             if ext in INEFFICIENT_FORMATS:
-                print(f"\n{file}: 이 포맷은 압축을 하면 비효율적이니 압축을 취소하였습니다.")
+                print(f"\n{file}: 압축하면 비효율적이니 압축 취소")
                 continue
             archive.write(file, os.path.basename(file))
             pp(i, total)
             time.sleep(0.1)
-    print("\n압축 완료:", output)
+    print("\n압축 완:", output)
 
 def decm_7z(file, output="."):
     with py7zr.SevenZipFile(file, 'r') as archive:
@@ -58,15 +58,15 @@ def decm_7z(file, output="."):
             archive.extract(targets=[name], path=output)
             pp(i, total)
             time.sleep(0.1)
-    print("\n압축 해제 완료:", output)
+    print("\n압축 해제 완:", output)
 
 def m():
     if len(sys.argv) < 3:
         print("사용법:")
-        print("  압축: cps z file1 file2 ...")
-        print("  압축: cps 7z file1 file2 ...")
-        print("  해제: uncps z archive.zip")
-        print("  해제: uncps 7z archive.7z")
+        print("압축: cps z file1 file2 ...")
+        print("압축: cps 7z file1 file2 ...")
+        print("해제: uncps z archive.zip")
+        print("해제: uncps 7z archive.7z")
         sys.exit(1)
 
     cm = sys.argv[1]
