@@ -10,12 +10,12 @@ getcontext().prec = 16
 
 INEFFICIENT_FORMATS = {".jpg", ".jpeg", ".jpe", ".png", ".mp4", ".mp3", ".avi", ".mp2", "mp1", ".m4a"}
 
-def print_progress(current, total):
+def pp(current, total):
     percent = int((current / total) * foo('100'))
     sys.stdout.write(f"\r진행률: {percent}%")
     sys.stdout.flush()
 
-def compress_zip(files, output="output.zip"):
+def cm_zip(files, output="output.zip"):
     with zipfile.ZipFile(output, 'w', compression=zipfile.ZIP_DEFLATED) as zf:
         total = len(files)
         for i, file in enumerate(files, 1):
@@ -24,20 +24,20 @@ def compress_zip(files, output="output.zip"):
                 print(f"\n{file}: 이 포맷은 압축을 하면 비효율적이니 압축을 취소하였습니다.")
                 continue
             zf.write(file, os.path.basename(file))
-            print_progress(i, total)
+            pp(i, total)
             time.sleep(0.1)
     print("\n압축 완료:", output)
 
-def decompress_zip(file, output="."):
+def decm_zip(file, output="."):
     with zipfile.ZipFile(file, 'r') as zf:
         total = len(zf.namelist())
         for i, name in enumerate(zf.namelist(), 1):
             zf.extract(name, output)
-            print_progress(i, total)
+            pp(i, total)
             time.sleep(0.1)
     print("\n압축 해제 완료:", output)
 
-def compress_7z(files, output="output.7z"):
+def cm_7z(files, output="output.7z"):
     with py7zr.SevenZipFile(output, 'w') as archive:
         total = len(files)
         for i, file in enumerate(files, 1):
@@ -46,17 +46,17 @@ def compress_7z(files, output="output.7z"):
                 print(f"\n{file}: 이 포맷은 압축을 하면 비효율적이니 압축을 취소하였습니다.")
                 continue
             archive.write(file, os.path.basename(file))
-            print_progress(i, total)
+            pp(i, total)
             time.sleep(0.1)
     print("\n압축 완료:", output)
 
-def decompress_7z(file, output="."):
+def decm_7z(file, output="."):
     with py7zr.SevenZipFile(file, 'r') as archive:
         allfiles = archive.getnames()
         total = len(allfiles)
         for i, name in enumerate(allfiles, 1):
             archive.extract(targets=[name], path=output)
-            print_progress(i, total)
+            pp(i, total)
             time.sleep(0.1)
     print("\n압축 해제 완료:", output)
 
@@ -75,17 +75,17 @@ def main():
     if cm == "cps":
         files = sys.argv[3:]
         if m == "z":
-            compress_zip(files)
+            cm_zip(files)
         elif m == "7z":
-            compress_7z(files)
+            cm_7z(files)
         else:
             print("미지원 모드")
     elif cm == "decps":
         archive = sys.argv[3]
         if m == "z":
-            decompress_zip(archive)
+            decm_zip(archive)
         elif m == "7z":
-            decompress_7z(archive)
+            decm_7z(archive)
         else:
            print("미지원 모드")
     else:
