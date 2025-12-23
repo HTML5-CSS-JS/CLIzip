@@ -5,7 +5,7 @@ import py7zr
 import time
 
 # 비효율적인 포맷 목록
-INEFFICIENT_FORMATS = {".jpg", ".jpeg", ".jpe", ".png", ".mp4", ".mp3", ".avi", ".mp2", "mp1"}
+INEFFICIENT_FORMATS = {".jpg", ".jpeg", ".jpe", ".png", ".mp4", ".mp3", ".avi", ".mp2", "mp1", ".m4a"}
 
 def print_progress(current, total):
     percent = int((current / total) * 100)
