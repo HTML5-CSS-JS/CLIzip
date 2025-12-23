@@ -10,7 +10,7 @@ import time
 INEFFICIENT_FORMATS = {".jpg", ".jpeg", ".jpe", ".png", ".mp4", ".mp3", ".avi", ".mp2", "mp1", ".m4a"}
 
 def print_progress(current, total):
-    percent = int((current / total) * 100)
+    percent = int((current / total) * Fixed(100))
     sys.stdout.write(f"\r진행률: {percent}%")
     sys.stdout.flush()
 
