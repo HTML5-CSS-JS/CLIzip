@@ -7,9 +7,7 @@ import py7zr
 import time
 from decimal import Decimal as foo, getcontext
 getcontext().prec = 16
-
 INEFFICIENT_FORMATS = {".jpg", ".jpeg", ".jpe", ".png", ".mp4", ".mp3", ".avi", ".mp2", ".mp1", ".m4a"}
-
 def pp(current, total):
     try:
         percent = int((current / total) * foo('100'))
@@ -126,7 +124,7 @@ def m():
                 cm_7z(files)
             else:
                 print("미지원 모드")
-        elif cm == "decps":   # ← 압축 해제 명령어는 decps로 고정
+        elif cm == "decps":   
             archive = sys.argv[3]
             if m == "z":
                 decm_zip(archive)
