@@ -10,4 +10,4 @@ dependencies = [
 
 [project.scripts]
 cps = "cps:main"
-uncps = "cps:main"
+decps = "cps:main"
