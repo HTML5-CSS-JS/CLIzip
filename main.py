@@ -26,12 +26,12 @@ def cm_zip(files, output="output.zip"):
                     print(f"\n{file}: 압축하면 비효율적이니 압축 취소")
                     continue
                 if not os.path.exists(file):
-                    print(f"\n{file}: 파일이 존재하지 않아 건너뜀")
+                    print(f"\n{file}: 파일이 없음")
                     continue
                 try:
                     zf.write(file, os.path.basename(file))
                 except PermissionError:
-                    print(f"\n{file}: 권한 오류로 건너뜀")
+                    print(f"\n{file}: 권한 오류")
                     continue
                 pp(i, total)
                 time.sleep(0.1)
@@ -47,15 +47,15 @@ def decm_zip(file, output="."):
                 try:
                     zf.extract(name, output)
                 except PermissionError:
-                    print(f"\n{name}: 권한 오류로 건너뜀")
+                    print(f"\n{name}: 권한 오류")
                     continue
                 pp(i, total)
                 time.sleep(0.1)
         print("\n압축 해제 완:", output)
     except FileNotFoundError:
-        print("ZIP 파일을 찾을 수 없습니다:", file)
+        print("ZIP 파일이 없음:", file)
     except zipfile.BadZipFile:
-        print("잘못된 ZIP 파일입니다:", file)
+        print("잘못된 ZIP 파일:", file)
     except Exception as e:
         print("ZIP 해제 중 오류 발생:", e)
 
@@ -69,12 +69,12 @@ def cm_7z(files, output="output.7z"):
                     print(f"\n{file}: 압축하면 비효율적이니 압축 취소")
                     continue
                 if not os.path.exists(file):
-                    print(f"\n{file}: 파일이 존재하지 않아 건너뜀")
+                    print(f"\n{file}: 파일 존재 불명")
                     continue
                 try:
                     archive.write(file, os.path.basename(file))
                 except PermissionError:
-                    print(f"\n{file}: 권한 오류로 건너뜀")
+                    print(f"\n{file}: 권한 오류")
                     continue
                 pp(i, total)
                 time.sleep(0.1)
@@ -91,15 +91,15 @@ def decm_7z(file, output="."):
                 try:
                     archive.extract(targets=[name], path=output)
                 except PermissionError:
-                    print(f"\n{name}: 권한 오류로 건너뜀")
+                    print(f"\n{name}: 권한 오류")
                     continue
                 pp(i, total)
                 time.sleep(0.1)
         print("\n압축 해제 완:", output)
     except FileNotFoundError:
-        print("7Z 파일을 찾을 수 없습니다:", file)
+        print("7Z 파일이 없음:", file)
     except py7zr.ArchiveError:
-        print("잘못된 7Z 파일입니다:", file)
+        print("잘못된 7Z 파일:", file)
     except Exception as e:
         print("7Z 해제 중 오류 발생:", e)
 
@@ -135,9 +135,9 @@ def m():
         else:
             print("미지원")
     except IndexError:
-        print("인자가 부족합니다.")
+        print("인자 부족")
     except Exception as e:
-        print("명령 실행 중 오류 발생:", e)
+        print("실행 중 오류 발생:", e)
 
 if __name__ == "__main__":
     m()
