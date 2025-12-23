@@ -7,7 +7,7 @@ import py7zr
 import time
 from decimal import Decimal as foo
 getcontext().prec = 16
-# 비효율적인 포맷 목록
+
 INEFFICIENT_FORMATS = {".jpg", ".jpeg", ".jpe", ".png", ".mp4", ".mp3", ".avi", ".mp2", "mp1", ".m4a"}
 
 def print_progress(current, total):
@@ -79,7 +79,7 @@ def main():
         elif m == "7z":
             compress_7z(files)
         else:
-            print("지원하지 않는 모드입니다. (z 또는 7z)")
+            print("미지원 모드")
     elif cm == "decps":
         archive = sys.argv[3]
         if m == "z":
@@ -87,9 +87,9 @@ def main():
         elif m == "7z":
             decompress_7z(archive)
         else:
-           print("지원하지 않는 모드입니다. (z 또는 7z)")
+           print("미지원 모드")
     else:
-        print("지원하지 않는 명령어입니다. (cps 또는 decps)")
+        print("미지원")
 
 if __name__ == "__main__":
     main()
