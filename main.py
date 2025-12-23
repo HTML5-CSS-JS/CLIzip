@@ -60,7 +60,7 @@ def decm_7z(file, output="."):
             time.sleep(0.1)
     print("\n압축 해제 완료:", output)
 
-def main():
+def m():
     if len(sys.argv) < 3:
         print("사용법:")
         print("  압축: cps z file1 file2 ...")
@@ -92,4 +92,4 @@ def main():
         print("미지원")
 
 if __name__ == "__main__":
-    main()
+    m()
