@@ -2,10 +2,6 @@
 name = "CLIzip"
 version = "alpha 1.0.0"
 description = "A simple CLI tool for ZIP and 7Z compression/decompression with progress display"
-authors = [
-    { name = "Your Name", email = "your.email@example.com" }
-]
-readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.8"
 dependencies = [
