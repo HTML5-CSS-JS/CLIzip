@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+# pypy 권장
 import sys
 import os
 import zipfile
