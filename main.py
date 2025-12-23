@@ -1,0 +1,95 @@
+#!/usr/bin/env python3
+import sys
+import os
+import zipfile
+import py7zr
+import time
+
+# 비효율적인 포맷 목록
+INEFFICIENT_FORMATS = {".jpg", ".jpeg", ".jpe", ".png", ".mp4", ".mp3", ".avi", ".mp2", "mp1"}
+
+def print_progress(current, total):
+    percent = int((current / total) * 100)
+    sys.stdout.write(f"\r진행률: {percent}%")
+    sys.stdout.flush()
+
+def compress_zip(files, output="output.zip"):
+    with zipfile.ZipFile(output, 'w', compression=zipfile.ZIP_DEFLATED) as zf:
+        total = len(files)
+        for i, file in enumerate(files, 1):
+            ext = os.path.splitext(file)[1].lower()
+            if ext in INEFFICIENT_FORMATS:
+                print(f"\n{file}: 이 포맷은 압축을 하면 비효율적이니 압축을 취소하였습니다.")
+                continue
+            zf.write(file, os.path.basename(file))
+            print_progress(i, total)
+            time.sleep(0.1)
+    print("\n압축 완료:", output)
+
+def decompress_zip(file, output="."):
+    with zipfile.ZipFile(file, 'r') as zf:
+        total = len(zf.namelist())
+        for i, name in enumerate(zf.namelist(), 1):
+            zf.extract(name, output)
+            print_progress(i, total)
+            time.sleep(0.1)
+    print("\n압축 해제 완료:", output)
+
+def compress_7z(files, output="output.7z"):
+    with py7zr.SevenZipFile(output, 'w') as archive:
+        total = len(files)
+        for i, file in enumerate(files, 1):
+            ext = os.path.splitext(file)[1].lower()
+            if ext in INEFFICIENT_FORMATS:
+                print(f"\n{file}: 이 포맷은 압축을 하면 비효율적이니 압축을 취소하였습니다.")
+                continue
+            archive.write(file, os.path.basename(file))
+            print_progress(i, total)
+            time.sleep(0.1)
+    print("\n압축 완료:", output)
+
+def decompress_7z(file, output="."):
+    with py7zr.SevenZipFile(file, 'r') as archive:
+        allfiles = archive.getnames()
+        total = len(allfiles)
+        for i, name in enumerate(allfiles, 1):
+            archive.extract(targets=[name], path=output)
+            print_progress(i, total)
+            time.sleep(0.1)
+    print("\n압축 해제 완료:", output)
+
+def main():
+    if len(sys.argv) < 3:
+        print("사용법:")
+        print("  압축: cps z file1 file2 ...")
+        print("  압축: cps 7z file1 file2 ...")
+        print("  해제: uncps z archive.zip")
+        print("  해제: uncps 7z archive.7z")
+        sys.exit(1)
+
+    command = sys.argv[1]
+    mode = sys.argv[2]
+
+    if command == "cps":
+        files = sys.argv[3:]
+        if mode == "z":
+            compress_zip(files)
+        elif mode == "7z":
+            compress_7z(files)
+        else:
+            print("지원하지 않는 모드입니다. (z 또는 7z)")
+    elif command == "decps":
+        archive = sys.argv[3]
+        if mode == "z":
+            decompress_zip(archive)
+        elif mode == "7z":
+            decompress_7z(archive)
+        else:
+            print("지원하지 않는 모드입니다. (z 또는 7z)")
+    elif command == "sudo":
+        print("이 프로그램은 sh계열 셸이 아닙니다.")
+    else:
+        print("지원하지 않는 명령어입니다. (cps 또는 decps)")
+
+if __name__ == "__main__":
+    main()
