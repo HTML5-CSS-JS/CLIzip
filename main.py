@@ -6,7 +6,7 @@ import py7zr
 import time
 
 INEFFICIENT_FORMATS = {".jpg", ".jpeg", ".jpe", ".png", ".mp4", ".mp3", ".avi", ".mp2", ".mp1", ".m4a"}
-MAX_FILE_SIZE = 1024 * 1024 * 1024  # 400MB 제한 (압축 해제 시)
+MAX_FILE_SIZE = 1024 * 1024 * 1024  # 1GB 제한 (압축 해제 시)
 
 def safe_path(base, target):
     """경로 탈출 방지"""
