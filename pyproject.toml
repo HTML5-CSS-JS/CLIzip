@@ -1,7 +1,7 @@
 [project]
 name = "CLIzip"
 version = "alpha 1.0.1"
-description = "A simple CLI tool for ZIP and 7Z compression/decompression with progress display"
+description = "A simple CLI tool for ZIP&7Z compression/decompression with progress display"
 license = { text = "MIT" }
 requires-python = "<=3.1.1"
 dependencies = [
