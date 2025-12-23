@@ -110,8 +110,8 @@ def m():
         print("사용법:")
         print("압축: cps z file1 file2 ...")
         print("압축: cps 7z file1 file2 ...")
-        print("해제: uncps z archive.zip")
-        print("해제: uncps 7z archive.7z")
+        print("해제: decps z archive.zip")
+        print("해제: decps 7z archive.7z")
         sys.exit(1)
 
     cm = sys.argv[1]
@@ -126,7 +126,7 @@ def m():
                 cm_7z(files)
             else:
                 print("미지원 모드")
-        elif cm == "uncps":
+        elif cm == "decps":   # ← 압축 해제 명령어는 decps로 고정
             archive = sys.argv[3]
             if m == "z":
                 decm_zip(archive)
