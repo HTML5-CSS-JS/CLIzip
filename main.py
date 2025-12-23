@@ -66,27 +66,25 @@ def main():
         print("  해제: uncps 7z archive.7z")
         sys.exit(1)
 
-    command = sys.argv[1]
-    mode = sys.argv[2]
+    cm = sys.argv[1]
+    m = sys.argv[2]
 
-    if command == "cps":
+    if cm == "cps":
         files = sys.argv[3:]
-        if mode == "z":
+        if m == "z":
             compress_zip(files)
-        elif mode == "7z":
+        elif m == "7z":
             compress_7z(files)
         else:
             print("지원하지 않는 모드입니다. (z 또는 7z)")
-    elif command == "decps":
+    elif cm == "decps":
         archive = sys.argv[3]
-        if mode == "z":
+        if m == "z":
             decompress_zip(archive)
-        elif mode == "7z":
+        elif m == "7z":
             decompress_7z(archive)
         else:
-            print("지원하지 않는 모드입니다. (z 또는 7z)")
-    elif command == "sudo":
-        print("이 프로그램은 sh계열 셸이 아닙니다.")
+           print("지원하지 않는 모드입니다. (z 또는 7z)")
     else:
         print("지원하지 않는 명령어입니다. (cps 또는 decps)")
 
