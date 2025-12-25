@@ -3,7 +3,8 @@ import sys
 import os
 import zipfile
 import py7zr
-import time
+import tempfile
+import stat
 
 INEFFICIENT_FORMATS = {".jpg", ".jpeg", ".jpe", ".png", ".mp4", ".mp3", ".avi", ".mp2", ".mp1", ".m4a"}
 MAX_FILE_SIZE = 1024 * 1024 * 1024  # 1GB 제한 (압축 해제 시)
@@ -12,24 +13,43 @@ def safe_path(base, target):
     """경로 탈출 방지"""
     abs_base = os.path.abspath(base)
     abs_target = os.path.abspath(os.path.join(base, target))
-    if not abs_target.startswith(abs_base):
+    if os.path.commonpath([abs_base, abs_target]) != abs_base:
         raise Exception(f"경로 탈출 시도 감지: {target}")
     return abs_target
 
+def is_safe_filename(name):
+    """파일명 검증"""
+    return not ("/" in name or "\\" in name or name.startswith(".."))
+
+def strip_exec_permission(path):
+    """실행 권한 제거"""
+    try:
+        mode = os.stat(path).st_mode
+        os.chmod(path, mode & ~stat.S_IXUSR & ~stat.S_IXGRP & ~stat.S_IXOTH)
+    except Exception:
+        pass
+
 def safe_extract_zip(zf, output):
     for name in zf.namelist():
+        if not is_safe_filename(name):
+            print(f"{name}: 위험한 파일명이라 제외")
+            continue
         target_path = safe_path(output, name)
         info = zf.getinfo(name)
         if info.file_size > MAX_FILE_SIZE:
             print(f"{name}: 파일 크기 초과로 해제 취소")
             continue
         zf.extract(name, output)
+        strip_exec_permission(target_path)
 
 def safe_extract_7z(archive, output):
     for name in archive.getnames():
+        if not is_safe_filename(name):
+            print(f"{name}: 위험한 파일명이라 제외")
+            continue
         target_path = safe_path(output, name)
-        # py7zr은 파일 크기 정보를 직접 제공하지 않으므로 별도 검사 필요
         archive.extract(targets=[name], path=output)
+        strip_exec_permission(target_path)
 
 def cm_zip(files, output="output.zip"):
     with zipfile.ZipFile(output, 'w', compression=zipfile.ZIP_DEFLATED) as zf:
@@ -52,6 +72,10 @@ def decm_zip(file, output="."):
         with zipfile.ZipFile(file, 'r') as zf:
             safe_extract_zip(zf, output)
         print("ZIP 해제 완료:", output)
+    except zipfile.BadZipFile:
+        print("손상된 ZIP 파일")
+    except PermissionError:
+        print("권한 오류")
     except Exception as e:
         print("ZIP 해제 오류:", e)
 
@@ -76,6 +100,10 @@ def decm_7z(file, output="."):
         with py7zr.SevenZipFile(file, 'r') as archive:
             safe_extract_7z(archive, output)
         print("7Z 해제 완료:", output)
+    except py7zr.Bad7zFile:
+        print("손상된 7Z 파일")
+    except PermissionError:
+        print("권한 오류")
     except Exception as e:
         print("7Z 해제 오류:", e)
 
