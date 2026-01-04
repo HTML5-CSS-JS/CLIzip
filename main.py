@@ -6,14 +6,14 @@ import py7zr
 import tempfile
 import stat
 
-INEFFICIENT_FORMATS = {".jpg", ".jpeg", ".jpe", ".png", ".mp4", ".mp3", ".avi", ".mp2", ".mp1", ".m4a"}
+INEFFICIENT_FORMATS = {".jpg", ".jpeg", ".jpe", ".jfif", ".png", ".apng", ".mp4", ".mp3", ".avi", ".mp2", ".mp1", ".m4a"}
 MAX_FILE_SIZE = 1024 * 1024 * 1024  # 1GB 제한 (압축 해제 시)
 
 def safe_path(base, target):
     """경로 탈출 방지"""
     abs_base = os.path.abspath(base)
     abs_target = os.path.abspath(os.path.join(base, target))
-    if os.path.commonpath([abs_base, abs_target]) != abs_base:
+    if os.path.commonpath([abs_base, abs_target]) != abs_base
         raise Exception(f"경로 탈출 시도 감지: {target}")
     return abs_target
 
